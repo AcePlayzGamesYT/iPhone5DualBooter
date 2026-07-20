@@ -578,7 +578,6 @@ class LegacyTranscriptFollower:
         cleaned = _ANSI_ESCAPE_RE.sub("", line)
         cleaned = _TERMINAL_CONTROL_RE.sub("", cleaned)
         cleaned = cleaned.replace("\r", "").strip()
-        # Remove terminal cursor/status-query fragments left by menu rendering.
         cleaned = re.sub(r"\[\d+(?:;\d+)*[A-Za-z]", "", cleaned)
         return cleaned.strip()
 
@@ -619,7 +618,6 @@ class LegacyTranscriptFollower:
                 emitted += 1
                 continue
 
-            # Skip pure menu cursor art while keeping actual prompts and logs.
             if re.fullmatch(r"[-=>\s*]+", line):
                 continue
             if line.startswith(("Updating files:", "PING ")):
@@ -818,11 +816,6 @@ def run_legacy_wsl_restore(
             distro,
             windows_idr_ack,
         )
-
-        # The prebuilt Devjam81 Windows executable is not source-patched with
-        # this project's iBEC retry, live post-iBEC Recovery reconnect, and ASR
-        # fixes.  Preserve those patches by forcing the compiled Linux/WSL
-        # backend.  This also overrides a stale True value saved by older builds.
         use_windows_host_idevicerestore = False
         if settings.use_windows_idevicerestore:
             log(
@@ -872,9 +865,6 @@ def run_legacy_wsl_restore(
         while True:
             attempt += 1
 
-            # Build/patch before asking the user to pwn the phone. The first
-            # build can take several minutes and should not leave a device
-            # sitting in pwnDFU while compilers and dependencies run.
             if not use_windows_host_idevicerestore:
                 ensure_patched_idevicerestore(
                     legacy_root=legacy_root,
@@ -890,9 +880,6 @@ def run_legacy_wsl_restore(
                 if watcher is not None and watcher.is_running:
                     watcher.stop()
 
-                # Release the target from WSL before the user moves it to a Mac
-                # or another jailbroken iOS host. Ignore cleanup failures because
-                # it may already be unplugged and attached to the external host.
                 try:
                     detach_attached_apple_devices(
                         log,
@@ -1205,8 +1192,6 @@ def run_legacy_wsl_restore(
                 )
 
             if action == "rerun":
-                # The next loop iteration asks for external pwnDFU again. This
-                # prevents a failed/reset device from silently reaching a6meowing.
                 continue
 
             if action == "cancel":
