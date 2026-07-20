@@ -2,8 +2,31 @@
 
 A crossplatform utility for restoring an iPhone 5 to a jailbroken iOS 8.4.1 host and installing a secondary iOS version using CoolBooterCLI. If your device is jailbroken untethered, but not on iOS 8.4.1, you can still use this tool. Select the Skip Restore option.
 
-This repository contains separate native applications for each supported operating system. Each version is designed specifically for its platform and does not rely on code from the other versions.
+This repository contains separate native applications for each supported operating system. Each version is built specifically for its platform and does not depend on code from the other implementations.
 
+CoolBooter Untether Troubleshooting
+
+If your device bootloops after restoring with the untether or after installing CoolBooter Untetherer, follow these steps:
+
+Force restart the device.
+Immediately hold Volume Down while it boots to enter your primary iOS installation.
+Open Cydia and allow all available package upgrades to install.
+
+Add the following repository if it is not already present:
+
+https://coolbooter.com
+Uninstall CoolBooter Untetherer.
+Downgrade CoolBooter CLI to version 1.0-release.
+Reinstall CoolBooter Untetherer.
+Reboot the device to test.
+
+If the first boot hangs after reinstalling the untether, force restart the device once more. In most cases, the untether will function normally after this. This appears to be a CoolBooter bug that affects some specific iOS versions.
+
+If the issue still persists, the recommended solution is to remove CoolBooter Untetherer and boot the secondary operating system manually whenever needed.
+
+You can manually boot the secondary OS over OpenSSH or from a terminal application by running:
+
+coolbootercli -b
 ---
 
 ## Supported Platforms
