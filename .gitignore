@@ -1,0 +1,39 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python caches and test/build output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.spec
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Runtime logs and downloaded/generated tool data
+*.log
+tools/Legacy-iOS-Kit/*
+!tools/Legacy-iOS-Kit/.gitkeep
+tools/windows-idevicerestore/*
+!tools/windows-idevicerestore/.gitkeep
+tools/idevicerestore-rebuild/*
+!tools/idevicerestore-rebuild/.gitkeep
+
+# Firmware, blobs, and other user/device data
+*.ipsw
+*.shsh
+*.shsh2
+saved/
+
+# Generated archives
+iphone5dualbooter.zip

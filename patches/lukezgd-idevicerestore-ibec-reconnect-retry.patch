@@ -1,0 +1,28 @@
+Reference behavior implemented by the bundled source patcher.
+
+Target repository:
+https://github.com/LukeZGD/idevicerestore
+
+Pinned source files:
+- src/dfu.c
+- src/recovery.c
+
+DFU/iBEC behavior:
+1. Keep the original first iBEC upload attempt.
+2. If it fails, close client->dfu->client and set it to NULL.
+3. Wait for usbipd/WSL to expose the device again.
+4. Reopen by the restore client's ECID.
+5. Subscribe the progress callback and set USB configuration 1.
+6. Retry the same personalized iBEC buffer.
+7. Repeat until IPHONE5DUALBOOTER_IBEC_RETRY_SECONDS expires.
+
+Post-iBEC recovery behavior:
+1. Open the device by ECID.
+2. Read its actual iBoot USB mode.
+3. Reject and close DFU/WTF handles left from the old enumeration.
+4. Poll once per second until a non-DFU recovery-mode handle appears.
+5. Store only that verified handle in client->recovery->client.
+
+Source patch markers:
+- IPHONE5DUALBOOTER_DFU_RECOVERY_RECONNECT_V6
+- IPHONE5DUALBOOTER_RECOVERY_MODE_WAIT_V1
