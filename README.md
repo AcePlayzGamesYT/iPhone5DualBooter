@@ -1,32 +1,46 @@
 # iPhone5DualBooter
 
-A crossplatform utility for restoring an iPhone 5 to a jailbroken iOS 8.4.1 host and installing a secondary iOS version using CoolBooterCLI. If your device is jailbroken untethered, but not on iOS 8.4.1, you can still use this tool. Select the Skip Restore option.
+A cross-platform utility for restoring a supported iPhone 5 to a jailbroken iOS 8.4.1 host and installing a secondary iOS version using CoolBooterCLI.
+
+If your device is already jailbroken and untethered but is not running iOS 8.4.1, you may still use this tool by selecting **Skip Restore**.
 
 This repository contains separate native applications for each supported operating system. Each version is built specifically for its platform and does not depend on code from the other implementations.
 
-CoolBooter Untether Troubleshooting
+---
 
-If your device bootloops after restoring with the untether or after installing CoolBooter Untetherer, follow these steps:
+## CoolBooter Untether Troubleshooting
 
-Force restart the device.
-Immediately hold Volume Down while it boots to enter your primary iOS installation.
-Open Cydia and allow all available package upgrades to install.
+If your device bootloops after restoring with the untether or after installing **CoolBooter Untetherer**, follow these steps:
 
-Add the following repository if it is not already present:
+1. Force restart the device.
+2. Immediately hold **Volume Down** while it boots to enter the primary iOS installation.
+3. Open **Cydia**.
+4. Install all available package upgrades.
+5. Add the following repository if it is not already present:
 
-https://coolbooter.com
-Uninstall CoolBooter Untetherer.
-Downgrade CoolBooter CLI to version 1.0-release.
-Reinstall CoolBooter Untetherer.
-Reboot the device to test.
+   ```text
+   https://coolbooter.com
+   ```
 
-If the first boot hangs after reinstalling the untether, force restart the device once more. In most cases, the untether will function normally after this. This appears to be a CoolBooter bug that affects some specific iOS versions.
+6. Uninstall **CoolBooter Untetherer**.
+7. Downgrade **CoolBooter CLI** to **version 1.0-release**.
+8. Reinstall **CoolBooter Untetherer**.
+9. Reboot the device to test the untether.
 
-If the issue still persists, the recommended solution is to remove CoolBooter Untetherer and boot the secondary operating system manually whenever needed.
+> [!NOTE]
+> If the first boot hangs after reinstalling the untether, force restart the device once more. In most cases, the untether should work normally afterward.
 
-You can manually boot the secondary OS over OpenSSH or from a terminal application by running:
+This appears to be a CoolBooter bug that only affects certain iOS versions.
 
+### If the problem continues
+
+Remove **CoolBooter Untetherer** and boot the secondary operating system manually through OpenSSH or a terminal application.
+
+Run:
+
+```bash
 coolbootercli -b
+```
 ---
 
 ## Supported Platforms
