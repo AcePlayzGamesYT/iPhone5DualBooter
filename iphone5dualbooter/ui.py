@@ -1052,7 +1052,6 @@ class MainWindow(QMainWindow):
         self.inspect_button.setEnabled(not busy)
         self.test_ssh_button.setEnabled(not busy)
         self.install_untether_only_button.setEnabled(not busy)
-        # Keep USB controls usable while Legacy is open because mode changes can detach it.
         self.refresh_usb_button.setEnabled(os.name == "nt")
         self.attach_usb_button.setEnabled(os.name == "nt")
         self.detach_usb_button.setEnabled(os.name == "nt")
@@ -1166,7 +1165,6 @@ class MainWindow(QMainWindow):
                 type=bool,
             )
         )
-        # Transition hotfix: do not revive an old saved Windows-host setting.
         self.use_windows_idevicerestore.setChecked(False)
         self.windows_idevicerestore_dir.setText(
             self.settings_store.value(
