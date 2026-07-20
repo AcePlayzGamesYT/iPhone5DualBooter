@@ -186,10 +186,6 @@ def _windows_to_wsl_path(
 ) -> str:
     raw_path = str(path.resolve())
 
-    # Do not put the Windows path in a shell command. Bash interprets each
-    # backslash as an escape, which turns C:\\Users\\Name into C:UsersName.
-    # Instead, transmit it through stdin and use `read -r` so every backslash
-    # arrives at wslpath literally.
     completed = subprocess.run(
         [
             str(wsl),
