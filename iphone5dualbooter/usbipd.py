@@ -225,8 +225,6 @@ def ensure_wsl_running(
             errors.append(f"{' '.join(command)}: {exc}")
             continue
 
-        # A successful keepalive remains running. Command/startup failures exit
-        # almost immediately, so give WSL a moment to initialize the distro.
         time.sleep(1.0)
         if process.poll() is None:
             _WSL_KEEPALIVES[distro_name] = process
@@ -298,7 +296,6 @@ def parse_usbipd_list(text: str) -> list[USBIPDDevice]:
         if not line or line.casefold().startswith(("connected:", "persisted:", "busid")):
             continue
 
-        # usbipd uses columns separated by multiple spaces.
         columns = [part.strip() for part in re.split(r"\s{2,}", line) if part.strip()]
         if len(columns) < 2 or not _VALID_BUSID.fullmatch(columns[0]):
             continue
@@ -539,8 +536,6 @@ def terminate_all_usbipd_wsl_attach_processes(log: LogFn) -> None:
         return
 
     killed: set[int] = set()
-    # Multiple passes catch a child monitor that briefly survives while its
-    # parent process tree is being torn down.
     for _ in range(4):
         matches = [
             item for item in _find_external_usbipd_wsl_attach_processes()
@@ -661,7 +656,6 @@ def start_usbipd_auto_attach(
             creationflags=_hidden_creationflags(),
         )
 
-        # Give the command enough time to reject unsupported arguments or fail.
         time.sleep(0.75)
         if process.poll() is not None:
             output = ""
@@ -1131,10 +1125,6 @@ class AppleUSBWatcher:
                     )
 
                 if self._native_auto_attach_supported:
-                    # Starting --auto-attach only creates a supervisor. It is
-                    # not proof that this new VID:PID is already attached.
-                    # The next usbipd list scan sets _attached_event only after
-                    # the state genuinely becomes Attached.
                     self._attached_event.clear()
                 else:
                     self._attached_event.set()
