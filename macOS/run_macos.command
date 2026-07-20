@@ -9,57 +9,65 @@ fail() {
     exit 1
 }
 
-have() {
-    command -v "$1" >/dev/null 2>&1
-}
+find_python() {
+    local candidate
 
-install_homebrew() {
-    printf 'Homebrew is required to install the native macOS dependencies.\n'
-    printf 'Install Homebrew from https://brew.sh and run this launcher again.\n'
-    fail "Homebrew was not found."
-}
-
-install_system_dependencies() {
-    have brew || install_homebrew
-    printf 'Checking macOS system dependencies...\n'
-    brew update
-    brew install python git curl libusb usbmuxd libimobiledevice
-}
-
-needs_system_dependencies() {
-    if ! have brew || ! have python3 || ! have git || ! have curl; then
-        return 0
-    fi
-    local formula
-    for formula in libusb usbmuxd libimobiledevice; do
-        if ! brew list --formula "$formula" >/dev/null 2>&1; then
-            return 0
+    for candidate in \
+        /usr/local/bin/python3.13 \
+        /opt/homebrew/bin/python3.13 \
+        /usr/local/bin/python3.12 \
+        /opt/homebrew/bin/python3.12 \
+        /usr/bin/python3
+    do
+        if [[ -x "$candidate" ]]; then
+            if "$candidate" -c 'import sys; raise SystemExit(not ((3, 8) <= sys.version_info[:2] < (3, 14)))' 2>/dev/null; then
+                printf '%s\n' "$candidate"
+                return 0
+            fi
         fi
     done
+
     return 1
+}
+
+install_python() {
+    command -v brew >/dev/null 2>&1 || fail "Install Homebrew from https://brew.sh, then run this launcher again."
+
+    printf 'Installing Python 3.13...\n'
+    brew install python@3.13
+
+    find_python || fail "Python 3.13 was installed but could not be found."
 }
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
     fail "This application requires macOS."
 fi
 
-if [[ "${1:-}" == "--install-only" ]]; then
-    install_system_dependencies
-    printf '\nmacOS dependencies are installed.\n'
-    exit 0
+PYTHON_BIN="$(find_python || true)"
+
+if [[ -z "$PYTHON_BIN" ]]; then
+    PYTHON_BIN="$(install_python)"
 fi
 
-if needs_system_dependencies; then
-    install_system_dependencies
-fi
+if [[ -d .venv ]]; then
+    VENV_VERSION="$(
+        .venv/bin/python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || true
+    )"
 
-have python3 || fail "Python 3 was not found after dependency installation."
+    if [[ "$VENV_VERSION" == "3.14" || -z "$VENV_VERSION" ]]; then
+        printf 'Removing incompatible Python virtual environment...\n'
+        rm -rf .venv
+    fi
+fi
 
 if [[ ! -d .venv ]]; then
-    python3 -m venv .venv || fail "Could not create the Python virtual environment."
+    printf 'Creating Python virtual environment with %s...\n' "$PYTHON_BIN"
+    "$PYTHON_BIN" -m venv .venv || fail "Could not create the Python virtual environment."
 fi
 
 source .venv/bin/activate
+
 python -m pip install --disable-pip-version-check --upgrade pip
 python -m pip install --disable-pip-version-check -r requirements.txt
+
 python app.py
