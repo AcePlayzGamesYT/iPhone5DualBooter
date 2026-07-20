@@ -73,11 +73,7 @@ def _install_direct_deb_bundle(
         raise RuntimeError("The iPhone does not have dpkg, so the packages cannot be installed.")
 
     log("APT is not on this jailbreak, so I am installing the .deb files directly instead.")
-
-    # A damaged/partial install can leave dpkg saying CoolBooterCLI is installed
-    # even though the actual coolbootercli executable is missing. Remove only
-    # that package first so the normal direct-install pass puts all of its files
-    # back. Dependencies are left alone.
+    
     if (
         package_id == CLI_PACKAGE
         and _package_is_configured(ssh, CLI_PACKAGE)
@@ -112,8 +108,6 @@ def _install_direct_deb_bundle(
 
     if remote_files:
         quoted_files = " ".join(shell_quote(path) for path in remote_files)
-        # First pass unpacks every package. The second pass and configure step deal
-        # with packages that could not configure until their dependencies existed.
         ssh.run(
             "export PATH=/usr/bin:/bin:/usr/sbin:/sbin; "
             f"dpkg -i {quoted_files} || true; "
@@ -137,8 +131,6 @@ def _install_direct_deb_bundle(
         )
 
     if package_id == CLI_PACKAGE and not _command_exists(ssh, "coolbootercli"):
-        # Do one forced repair attempt in case dpkg reported success but failed
-        # to restore the executable during the normal package-plan pass.
         log("CoolBooterCLI installed, but the command is still missing. Deleting and reinstalling it once more.")
         cli_package = next(
             package for package in resolve_package_plan(CLI_PACKAGE)
@@ -273,8 +265,6 @@ def run_workflow(
         stage(55, "Copying secondary IPSW")
         remote_ipsw = "/var/cbooter/" + settings.secondary_ipsw.name
 
-        # The small jailbreak bootstrap does not always include wc or stat.
-        # Reuse the selected IPSW when a file with the same name already exists.
         exists_code, _ = ssh.run(
             f"test -f {shell_quote(remote_ipsw)}",
             check=False,
@@ -301,8 +291,6 @@ def run_workflow(
             log("IPSW copy finished and the file is on the iPhone.")
 
         stage(68, "Installing secondary iOS")
-        # validate_secondary_version() only allows digits, dots, and an optional
-        # beta suffix, so the version can be passed directly without quotes.
         command = f"coolbootercli {version}"
         if settings.datasize_gb is not None:
             command += f" --datasize {settings.datasize_gb}GB"
