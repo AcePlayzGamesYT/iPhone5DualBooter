@@ -45,7 +45,7 @@ To install only the system dependencies:
 
 ## Workflow
 
-1. Put the iPhone in pwnDFU.
+1. Put the iPhone in pwnDFU. This can be done via Legacy iOS Kit ran by the workflow.
 2. Select the stock iOS 8.4.1 IPSW.
 3. Select the secondary IPSW and enter its version.
 4. Start the workflow.
