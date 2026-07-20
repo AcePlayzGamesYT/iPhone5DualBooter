@@ -22,14 +22,10 @@ COOLBOOTER_INDEX_URLS = (
     urllib.parse.urljoin(COOLBOOTER_BASE_URL, "Packages"),
 )
 
-# CoolBooter only hosts its own package. These command-line dependencies are
-# normal jailbreak bootstrap packages and are downloaded from Saurik's archive.
+# dependencies downladiong
 LEGACY_ARCHIVE_BASE_URL = "https://apt.saurik.com/debs/"
 KNOWN_DIRECT_DEPENDENCIES: dict[str, tuple[str, ...]] = {
     "com.coolbooter.coolbootercli": (
-        # xpwn needs png, and wget needs gettext. Include both before
-        # their parent packages because this path does not have APT to
-        # discover or install transitive dependencies for us.
         "png",
         "xpwn",
         "zip",
@@ -39,8 +35,6 @@ KNOWN_DIRECT_DEPENDENCIES: dict[str, tuple[str, ...]] = {
         "wget",
     ),
     "com.coolbooter.cbuntether": (
-        # MobileSubstrate itself needs Substrate Safe Mode. This jailbreak does
-        # not include APT, so install the full chain directly in dependency order.
         "com.saurik.substrate.safemode",
         "mobilesubstrate",
     ),
@@ -176,8 +170,6 @@ def resolve_package_plan(package_id: str) -> list[RepositoryPackage]:
     ordered: list[RepositoryPackage] = []
     added: set[str] = set()
 
-    # The direct path cannot rely on APT, so explicitly include CoolBooter's
-    # bootstrap dependencies even though they live in another repository.
     dependency_names: list[str] = list(KNOWN_DIRECT_DEPENDENCIES.get(package_id, ()))
     dependency_text = ", ".join(part for part in (target.pre_depends, target.depends) if part)
     for alternatives in _dependency_groups(dependency_text):
