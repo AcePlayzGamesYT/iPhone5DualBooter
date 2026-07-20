@@ -29,7 +29,7 @@ class IOSSSH:
         sock = socket.create_connection((self.host, self.port), timeout=timeout)
         transport = paramiko.Transport(sock)
 
-        # Old iOS OpenSSH commonly requires SHA-1-era algorithms.
+        # compatibility
         security = transport.get_security_options()
         try:
             if "diffie-hellman-group1-sha1" not in security.kex:
